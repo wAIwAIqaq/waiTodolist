@@ -1,8 +1,12 @@
 <template>
   <div class="min-h-[100vh] gap-5 items-start content-start bg-[#18181c] p-10">
-    <n-divider title-placement="center" class="text-sky-100">
+    <n-divider
+      title-placement="center"
+      class="text-sky-100"
+      @click="show = !show"
+    >
       {{ dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss") }}
-      <n-button text type="primary" @click="show = !show">
+      <n-button text type="primary">
         <template #icon>
           <component
             :is="'ion-icon'"
@@ -29,6 +33,10 @@
         </div>
       </div>
     </n-collapse-transition>
+  </div>
+  <div class="fixed flex gap-5 right-5 bottom-5">
+    <n-button @click="readFile">readFile</n-button>
+    <n-button @click="writeFile">writeFile</n-button>
   </div>
 </template>
 
@@ -121,6 +129,57 @@ const validateChanged = (changedItem, item) => {
 const changeTodoListItem = (changedItem) => {
   dialog.destroyAll();
   console.log("changeItem", changedItem);
+};
+
+const readFile = async () => {
+  if (window.showOpenFilePicker) {
+    const fileList = await showOpenFilePicker({
+      types: [
+        {
+          description: "JSON",
+          accept: {
+            "json/*": [".json"],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    });
+    fileList.forEach(async (item) => {
+      const fileData = await item.getFile();
+      const text = await fileData.text();
+      try {
+        const fileJSONObj = JSON.parse(text);
+        todoListStore.updateTodoList(fileJSONObj);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+};
+
+const writeFile = async () => {
+  if (window.showOpenFilePicker) {
+    const fileList = await showOpenFilePicker({
+      types: [
+        {
+          description: "JSON",
+          accept: {
+            "json/*": [".json"],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    });
+    fileList.forEach(async (item) => {
+      const fileData = await item.getFile();
+      const text = await fileData.text();
+      const writableStream = await item.createWritable();
+      await writableStream.write(JSON.stringify(todoList.value));
+      await writableStream.close();
+    });
+  }
 };
 </script>
 
