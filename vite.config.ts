@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
@@ -25,6 +26,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
+      vueJsx(),
       VueDevTools(),
       AutoImport({
         imports: [
