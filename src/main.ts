@@ -8,6 +8,7 @@ import App from "./App.vue";
 const app = createApp(App);
 
 app.config.compilerOptions.isCustomElement = (tag) => {
+  console.log(tag)
   return tag.startsWith('ion-')
 }
 app.use(store);

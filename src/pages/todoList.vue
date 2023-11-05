@@ -1,10 +1,9 @@
 <template>
   <div
-    class="min-h-[100vh] gap-5 items-start content-start p-10 transition-all"
-    :style="{ 'background-color': themeStore.isDark ? '#18181c' : '#ffffff' }"
+    class="min-h-[100vh] gap-5 items-start content-start dark:bg-[#18181c] p-10 transition-all"
   >
     <div v-for="dateItem in todoList" :key="dateItem.date">
-      <n-divider title-placement="center" class="text-sky-100">
+      <n-divider title-placement="center" class="dark:text-sky-100">
         <div
           class="cursor-pointer flex items-center gap-2"
           @click="dateItem.show = !dateItem.show"
@@ -29,7 +28,7 @@
           <div
             v-for="(item, index) in dateItem.list"
             :key="index"
-            class="todo-list-item flex flex-col gap-4 p-4 text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
+            class="todo-list-item flex flex-col gap-4 p-4 dark:text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
             @click="showItemDetail(item)"
           >
             <div
