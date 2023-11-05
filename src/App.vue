@@ -28,7 +28,7 @@ const darkTheme = createTheme([
 <template>
   <n-config-provider
     class="h-full w-full overflow-auto"
-    :theme="themeStore.theme === 'dark' ? darkTheme : undefined"
+    :theme="themeStore.theme.themeColor === 'dark' ? darkTheme : undefined"
     :locale="zhCN"
     :date-locale="dateZhCN"
   >

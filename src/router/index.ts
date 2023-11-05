@@ -8,6 +8,10 @@ NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
 export const routes: Array<RouteRecordRaw> = [
   {
+    path: '/',
+    redirect: '/home'
+  },
+  {
     path: "/home",
     meta: { title: "首页" },
     component: () => import("@/pages/home.vue"),

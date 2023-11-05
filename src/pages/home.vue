@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex relative justify-center items-center min-w-full min-h-full overflow-auto bg-[#18181c] p-2"
+    class="flex relative justify-center items-center min-w-[100vw] min-h-[100vh] overflow-auto bg-[#18181c] p-2"
   >
     <h1 class="title animate-bounce" @click="toTodoList">
       <span

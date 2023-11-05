@@ -79,7 +79,7 @@ import { useThemeStore } from "@/store/theme";
 const themeStore = useThemeStore();
 
 const toggleTheme = () => {
-  if (themeStore.theme === "dark") {
+  if (themeStore.theme.themeColor === "dark") {
     themeStore.toggleTheme("light");
   } else {
     themeStore.toggleTheme("dark");
@@ -87,12 +87,13 @@ const toggleTheme = () => {
 };
 
 onMounted(() => {
-  themeStore.toggleTheme("dark");
+  themeStore.initTheme()
 });
 
 const show = ref(true);
 
 const todoListStore = useTodoListStore();
+todoListStore.initTodoList()
 const { todoList } = storeToRefs(todoListStore);
 const dialog = useDialog();
 const showModal = ref(false);
@@ -195,7 +196,7 @@ const readFile = async () => {
       const text = await fileData.text();
       try {
         const fileJSONObj = JSON.parse(text);
-        todoListStore.initTodoList(fileJSONObj);
+        todoListStore.readTodoList(fileJSONObj);
       } catch (error) {
         console.error(error);
       }
