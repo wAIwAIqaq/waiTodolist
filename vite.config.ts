@@ -25,7 +25,13 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
     },
     plugins: [
-      vue(),
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith('ion-')
+          }
+        }
+      }),
       vueJsx(),
       VueDevTools(),
       AutoImport({

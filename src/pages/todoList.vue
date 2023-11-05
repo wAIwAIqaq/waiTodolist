@@ -29,6 +29,10 @@
             v-for="(item, index) in dateItem.list"
             :key="index"
             class="todo-list-item flex flex-col gap-4 p-4 dark:text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
+            :class="{
+              'todo-list-item__urgent': isUrgent(item.date),
+              'todo-list-item__passed': isPassed(item.date),
+            }"
             @click="showItemDetail(item)"
           >
             <div
@@ -99,25 +103,25 @@ const showItemDetail = (item) => {
             <n-input
               v-model:value={changedItem.value.title}
               placeholder={"取个啥标题呢?"}
-              onInput={() =>
-                (isChanged.value = validateChanged(changedItem.value, item))
+              onInput={(val) =>
+                (isChanged.value = validateChanged(val, item.title))
               }
             />
           </div>
           <n-date-picker
             v-model:value={changedItem.value.date}
             type={"datetime"}
-            onConfirm={() =>
-              (isChanged.value = validateChanged(changedItem.value, item))
-            }
+            onConfirm={(val) => {
+              isChanged.value = validateChanged(val, item.date);
+            }}
           />
           <n-input
             spellCheck={false}
             v-model:value={changedItem.value.text}
             type={"textarea"}
             placeholder={"要干嘛呢？"}
-            onInput={() =>
-              (isChanged.value = validateChanged(changedItem.value, item))
+            onInput={(val) =>
+              (isChanged.value = validateChanged(val, item.text))
             }
             autosize={{
               minRows: 3,
@@ -143,20 +147,23 @@ const showItemDetail = (item) => {
   });
 };
 
-const validateChanged = (changedItem, item) => {
-  let isChanged = false;
-  for (const key in changedItem) {
-    if (changedItem[key] !== item[key]) {
-      isChanged = true;
-      break;
-    }
-  }
-  return isChanged;
+const validateChanged = (val, oldVal) => {
+  console.log(val, oldVal);
+  return val !== oldVal;
 };
 
 const changeTodoListItem = (changedItem) => {
   dialog.destroyAll();
   console.log("changeItem", changedItem);
+};
+
+const isUrgent = (time) => {
+  console.log(time);
+  return true;
+};
+
+const isPassed = (time) => {
+  return new Date().valueOf() - time > 0 ? true : false;
 };
 
 const readFile = async () => {
@@ -212,8 +219,14 @@ const writeFile = async () => {
 </script>
 
 <style scoped lang="scss">
-$activeColor: #7fe7c4;
 .todo-list-item {
+  $activeColor: #7fe7c4;
+  & .todo-list-item__urgent {
+    $activeColor: #f2c97d;
+  }
+  & .todo-list-item__passed {
+    $activeColor: #e88080;
+  }
   display: flex;
   flex: column;
   border: 1px solid $activeColor;
