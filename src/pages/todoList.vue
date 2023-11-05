@@ -1,42 +1,64 @@
 <template>
-  <div class="min-h-[100vh] gap-5 items-start content-start bg-[#18181c] p-10">
-    <n-divider
-      title-placement="center"
-      class="text-sky-100"
-      @click="show = !show"
-    >
-      {{ dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss") }}
-      <n-button text type="primary">
-        <template #icon>
-          <component
-            :is="'ion-icon'"
-            :name="show ? 'chevron-collapse-outline' : 'chevron-expand-outline'"
-          />
-        </template>
-      </n-button>
-    </n-divider>
-    <n-collapse-transition :show="show">
-      <div class="grid grid-cols-8 gap-6">
+  <div
+    class="min-h-[100vh] gap-5 items-start content-start p-10 transition-all"
+    :style="{ 'background-color': themeStore.isDark ? '#18181c' : '#ffffff' }"
+  >
+    <div v-for="dateItem in todoList" :key="dateItem.date">
+      <n-divider title-placement="center" class="text-sky-100">
         <div
-          v-for="(item, index) in todoList"
-          :key="index"
-          class="todo-list-item flex flex-col gap-4 p-4 text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
-          @click="showItemDetail(item)"
+          class="cursor-pointer flex items-center gap-2"
+          @click="dateItem.show = !dateItem.show"
         >
-          <div
-            class="item-title flex w-[200px] justify-between gap-3 text-2xl transition-all"
-          >
-            {{ item.title }}
-          </div>
-          <div>{{ dayjs(item.date).format("YYYY-MM-DD HH:mm:ss") }}</div>
-          <div>{{ item.text }}</div>
+          {{ dayjs(dateItem.date).format("YYYY-MM-DD") }}
+          <n-button text type="primary">
+            <template #icon>
+              <component
+                :is="'ion-icon'"
+                :name="
+                  dateItem.show
+                    ? 'chevron-collapse-outline'
+                    : 'chevron-expand-outline'
+                "
+              />
+            </template>
+          </n-button>
         </div>
-      </div>
-    </n-collapse-transition>
+      </n-divider>
+      <n-collapse-transition :show="dateItem.show">
+        <div class="grid grid-cols-8 gap-6">
+          <div
+            v-for="(item, index) in dateItem.list"
+            :key="index"
+            class="todo-list-item flex flex-col gap-4 p-4 text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
+            @click="showItemDetail(item)"
+          >
+            <div
+              class="item-title flex w-[200px] justify-between gap-3 text-2xl transition-all"
+            >
+              {{ item.title }}
+            </div>
+            <div>{{ dayjs(item.date).format("YYYY-MM-DD HH:mm:ss") }}</div>
+            <div>{{ item.text }}</div>
+          </div>
+        </div>
+      </n-collapse-transition>
+    </div>
   </div>
   <div class="fixed flex gap-5 right-5 bottom-5">
-    <n-button @click="readFile">readFile</n-button>
-    <n-button @click="writeFile">writeFile</n-button>
+    <n-button type="primary" circle @click="readFile">
+      <template #icon>
+        <ion-icon name="add-sharp"></ion-icon>
+      </template>
+    </n-button>
+    <n-button type="primary" circle @click="writeFile">
+      <template #icon>
+        <ion-icon name="save-outline"></ion-icon>
+      </template>
+    </n-button>
+    <n-button type="primary" circle @click="toggleTheme">
+      切换主题
+      {{ themeStore.isDark }}
+    </n-button>
   </div>
 </template>
 
@@ -47,6 +69,13 @@ import { storeToRefs } from "pinia";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import dayjs from "dayjs";
 import { useDialog } from "naive-ui";
+
+import { useThemeStore } from "@/store/theme";
+
+const themeStore = useThemeStore();
+const toggleTheme = () => {
+  console.log(themeStore.toggleTheme());
+};
 
 const show = ref(true);
 

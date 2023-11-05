@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { darkTheme, zhCN, dateZhCN } from "naive-ui";
+import { storeToRefs } from "pinia";
+import { useThemeStore } from "@/store/theme";
+
 import {
   createTheme,
   inputDark,
@@ -7,22 +10,25 @@ import {
   buttonDark,
   dialogDark,
   scrollbarDark,
-  dividerDark
+  dividerDark,
 } from "naive-ui";
+
+const themeStore = useThemeStore()
+
 const darkTheme = createTheme([
   inputDark,
   datePickerDark,
   buttonDark,
   dialogDark,
   scrollbarDark,
-  dividerDark
+  dividerDark,
 ]);
 </script>
 
 <template>
   <n-config-provider
     class="h-full w-full overflow-auto"
-    :theme="darkTheme"
+    :theme="themeStore.isDark ? darkTheme : undefined"
     :locale="zhCN"
     :date-locale="dateZhCN"
   >
