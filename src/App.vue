@@ -13,7 +13,7 @@ import {
   dividerDark,
 } from "naive-ui";
 
-const themeStore = useThemeStore()
+const themeStore = useThemeStore();
 
 const darkTheme = createTheme([
   inputDark,
@@ -28,7 +28,7 @@ const darkTheme = createTheme([
 <template>
   <n-config-provider
     class="h-full w-full overflow-auto"
-    :theme="themeStore.isDark ? darkTheme : undefined"
+    :theme="themeStore.theme === 'dark' ? darkTheme : undefined"
     :locale="zhCN"
     :date-locale="dateZhCN"
   >

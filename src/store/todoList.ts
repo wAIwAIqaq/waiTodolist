@@ -7,8 +7,21 @@ export const useTodoListStore = defineStore({
     };
   },
   actions: {
-    updateTodoList(list: []) {
-      this.todoList.push(...list);
+    updateTodoList(todoItem) {
+      const dateItem = this.todoList?.find(
+        (item) => item.date === todoItem.date
+      );
+      if (dateItem) {
+        dateItem.list.push(todoItem);
+      } else {
+        const dateItem = { date: todoItem.date, list: [], show: true };
+        dateItem.list.push(todoItem);
+        this.todoList.push(dateItem);
+      }
+    },
+    initTodoList(todoList) {
+      debugger
+      this.todoList = todoList;
     },
   },
 });

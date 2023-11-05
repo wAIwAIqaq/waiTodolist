@@ -3,15 +3,15 @@ export const useThemeStore = defineStore({
   id: "theme",
   state: () => {
     return {
-      isDark: true,
+      theme: 'dark',
     };
   },
   actions: {
-    toggleTheme() {
-      this.isDark = !this.isDark;
+    toggleTheme(theme) {
+      this.theme = theme;
       // On page load or when changing themes, best to add inline in `head` to avoid FOUC
       if (
-        this.isDark === true ||
+        this.theme === 'dark' ||
         (!("theme" in localStorage) &&
           window.matchMedia("(prefers-color-scheme: dark)").matches)
       ) {

@@ -29,10 +29,6 @@
             v-for="(item, index) in dateItem.list"
             :key="index"
             class="todo-list-item flex flex-col gap-4 p-4 dark:text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
-            :class="{
-              'todo-list-item__urgent': isUrgent(item.date),
-              'todo-list-item__passed': isPassed(item.date),
-            }"
             @click="showItemDetail(item)"
           >
             <div
@@ -40,7 +36,7 @@
             >
               {{ item.title }}
             </div>
-            <div>{{ dayjs(item.date).format("YYYY-MM-DD HH:mm:ss") }}</div>
+            <div>{{ dayjs(item.date).format("YYYY-MM-DD") }}</div>
             <div>{{ item.text }}</div>
           </div>
         </div>
@@ -48,9 +44,14 @@
     </div>
   </div>
   <div class="fixed flex gap-5 right-5 bottom-5">
-    <n-button type="primary" circle @click="readFile">
+    <n-button type="primary" circle @click="showItemDetail()">
       <template #icon>
         <ion-icon name="add-sharp"></ion-icon>
+      </template>
+    </n-button>
+    <n-button type="primary" circle @click="readFile">
+      <template #icon>
+        <ion-icon name="reader-outline"></ion-icon>
       </template>
     </n-button>
     <n-button type="primary" circle @click="writeFile">
@@ -58,38 +59,46 @@
         <ion-icon name="save-outline"></ion-icon>
       </template>
     </n-button>
-    <n-button type="primary" circle @click="toggleTheme">
-      切换主题
-      {{ themeStore.isDark }}
+    <n-button type="primary" circle @click="toggleTheme"> 
+      <template #icon>
+        <ion-icon name="contrast-outline"></ion-icon>
+      </template>
     </n-button>
   </div>
 </template>
 
 <script setup lang="tsx">
-import { computed, watch, isRef, defineComponent } from "vue";
+import { computed, watch, isRef, defineComponent, onMounted } from "vue";
 import { useTodoListStore } from "@/store/todoList";
 import { storeToRefs } from "pinia";
-import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import dayjs from "dayjs";
 import { useDialog } from "naive-ui";
 
 import { useThemeStore } from "@/store/theme";
 
 const themeStore = useThemeStore();
+
 const toggleTheme = () => {
-  console.log(themeStore.toggleTheme());
+  if (themeStore.theme === "dark") {
+    themeStore.toggleTheme("light");
+  } else {
+    themeStore.toggleTheme("dark");
+  }
 };
+
+onMounted(() => {
+  themeStore.toggleTheme("dark");
+});
 
 const show = ref(true);
 
-defineComponent({
-  CreateIcon,
-});
 const todoListStore = useTodoListStore();
 const { todoList } = storeToRefs(todoListStore);
 const dialog = useDialog();
 const showModal = ref(false);
-const showItemDetail = (item) => {
+const showItemDetail = (
+  item = { title: "", date: new Date().valueOf(), text: "" }
+) => {
   const changedItem = ref({ ...item });
   const isChanged = ref(false);
   dialog.create({
@@ -110,8 +119,9 @@ const showItemDetail = (item) => {
           </div>
           <n-date-picker
             v-model:value={changedItem.value.date}
-            type={"datetime"}
-            onConfirm={(val) => {
+            type={"date"}
+            format="yyyy-MM-dd"
+            on-update:value={(val) => {
               isChanged.value = validateChanged(val, item.date);
             }}
           />
@@ -137,7 +147,7 @@ const showItemDetail = (item) => {
         <n-button
           disabled={!isChanged.value}
           onClick={() => {
-            changeTodoListItem(changedItem);
+            changeItemHandler(changedItem);
           }}
         >
           保存它
@@ -152,9 +162,9 @@ const validateChanged = (val, oldVal) => {
   return val !== oldVal;
 };
 
-const changeTodoListItem = (changedItem) => {
+const changeItemHandler = (changedItem) => {
   dialog.destroyAll();
-  console.log("changeItem", changedItem);
+  todoListStore.updateTodoList(changedItem.value);
 };
 
 const isUrgent = (time) => {
@@ -185,7 +195,7 @@ const readFile = async () => {
       const text = await fileData.text();
       try {
         const fileJSONObj = JSON.parse(text);
-        todoListStore.updateTodoList(fileJSONObj);
+        todoListStore.initTodoList(fileJSONObj);
       } catch (error) {
         console.error(error);
       }
@@ -221,12 +231,6 @@ const writeFile = async () => {
 <style scoped lang="scss">
 .todo-list-item {
   $activeColor: #7fe7c4;
-  & .todo-list-item__urgent {
-    $activeColor: #f2c97d;
-  }
-  & .todo-list-item__passed {
-    $activeColor: #e88080;
-  }
   display: flex;
   flex: column;
   border: 1px solid $activeColor;
