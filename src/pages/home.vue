@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from "vue";
-import ColorfulBg from "@/components/ColorfulBg.vue";
+import { defineComponent, computed } from "vue";
+import ColorfulBg from "@/components/colorfulBg.vue";
 import { useRouter } from "vue-router";
 defineComponent({
   ColorfulBg,

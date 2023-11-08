@@ -1,11 +1,11 @@
 interface TodoItem {
   title: string,
-  date: string,
+  date: number,
   text: string
 }
 
 interface DateItem {
-  date: string,
+  date: number,
   show: boolean,
   list: TodoItem[]
 }

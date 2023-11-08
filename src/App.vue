@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { darkTheme, zhCN, dateZhCN } from "naive-ui";
-import { storeToRefs } from "pinia";
 import { useThemeStore } from "@/store/theme";
 
 import {
+  zhCN,
+  dateZhCN,
   createTheme,
   inputDark,
   datePickerDark,
@@ -11,6 +11,7 @@ import {
   dialogDark,
   scrollbarDark,
   dividerDark,
+  cardDark,
 } from "naive-ui";
 
 const themeStore = useThemeStore();
@@ -22,6 +23,7 @@ const darkTheme = createTheme([
   dialogDark,
   scrollbarDark,
   dividerDark,
+  cardDark,
 ]);
 </script>
 

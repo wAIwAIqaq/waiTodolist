@@ -1,8 +1,8 @@
 <template>
   <div
-    class="min-h-[100vh] gap-5 items-start content-start dark:bg-[#18181c] p-10 transition-all"
+    class="min-h-[100vh] flex flex-col gap-2 items-start content-start dark:bg-[#18181c] p-10 transition-all"
   >
-    <div v-for="dateItem in todoList" :key="dateItem.date">
+    <n-card v-for="dateItem in todoList" :key="dateItem.date">
       <n-divider title-placement="center" class="dark:text-sky-100">
         <div
           class="cursor-pointer flex items-center gap-2"
@@ -32,16 +32,18 @@
             @click="showItemDetail(item)"
           >
             <div
-              class="item-title flex w-[200px] justify-between gap-3 text-2xl transition-all"
+              class="item-title flex justify-between gap-3 text-2xl transition-all"
             >
               {{ item.title }}
             </div>
             <div>{{ dayjs(item.date).format("YYYY-MM-DD") }}</div>
-            <div>{{ item.text }}</div>
+            <n-ellipsis :line-clamp="3">
+              {{ item.text }}
+            </n-ellipsis>
           </div>
         </div>
       </n-collapse-transition>
-    </div>
+    </n-card>
   </div>
   <div class="fixed flex gap-5 right-5 bottom-5">
     <n-button type="primary" circle @click="showItemDetail()">
@@ -59,7 +61,7 @@
         <ion-icon name="save-outline"></ion-icon>
       </template>
     </n-button>
-    <n-button type="primary" circle @click="toggleTheme"> 
+    <n-button type="primary" circle @click="toggleTheme">
       <template #icon>
         <ion-icon name="contrast-outline"></ion-icon>
       </template>
@@ -68,7 +70,7 @@
 </template>
 
 <script setup lang="tsx">
-import { computed, watch, isRef, defineComponent, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useTodoListStore } from "@/store/todoList";
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
@@ -87,18 +89,19 @@ const toggleTheme = () => {
 };
 
 onMounted(() => {
-  themeStore.initTheme()
+  themeStore.initTheme();
 });
 
-const show = ref(true);
+const todayTimestamp = computed(() => {
+  return dayjs(dayjs(new Date()).format("YYYY-MM-DD")).valueOf();
+});
 
 const todoListStore = useTodoListStore();
-todoListStore.initTodoList()
+todoListStore.initTodoList();
 const { todoList } = storeToRefs(todoListStore);
 const dialog = useDialog();
-const showModal = ref(false);
 const showItemDetail = (
-  item = { title: "", date: new Date().valueOf(), text: "" }
+  item = { title: "", date: todayTimestamp.value, text: "" }
 ) => {
   const changedItem = ref({ ...item });
   const isChanged = ref(false);
@@ -113,7 +116,7 @@ const showItemDetail = (
             <n-input
               v-model:value={changedItem.value.title}
               placeholder={"取个啥标题呢?"}
-              onInput={(val) =>
+              onInput={(val: string) =>
                 (isChanged.value = validateChanged(val, item.title))
               }
             />
@@ -122,8 +125,9 @@ const showItemDetail = (
             v-model:value={changedItem.value.date}
             type={"date"}
             format="yyyy-MM-dd"
-            on-update:value={(val) => {
+            on-update:value={(val: number) => {
               isChanged.value = validateChanged(val, item.date);
+              changedItem.value.date = val;
             }}
           />
           <n-input
@@ -131,7 +135,7 @@ const showItemDetail = (
             v-model:value={changedItem.value.text}
             type={"textarea"}
             placeholder={"要干嘛呢？"}
-            onInput={(val) =>
+            onInput={(val: string) =>
               (isChanged.value = validateChanged(val, item.text))
             }
             autosize={{
@@ -148,7 +152,7 @@ const showItemDetail = (
         <n-button
           disabled={!isChanged.value}
           onClick={() => {
-            changeItemHandler(changedItem);
+            changeItemHandler(changedItem.value);
           }}
         >
           保存它
@@ -158,28 +162,27 @@ const showItemDetail = (
   });
 };
 
-const validateChanged = (val, oldVal) => {
-  console.log(val, oldVal);
+const validateChanged = (val: string | number, oldVal: string | number) => {
   return val !== oldVal;
 };
 
-const changeItemHandler = (changedItem) => {
+const changeItemHandler = (changedItem: TodoItem) => {
   dialog.destroyAll();
-  todoListStore.updateTodoList(changedItem.value);
+  todoListStore.updateTodoList(changedItem);
 };
 
-const isUrgent = (time) => {
-  console.log(time);
-  return true;
-};
+// const isUrgent = (time) => {
+//   console.log(time);
+//   return true;
+// };
 
-const isPassed = (time) => {
-  return new Date().valueOf() - time > 0 ? true : false;
-};
+// const isPassed = (time) => {
+//   return new Date().valueOf() - time > 0 ? true : false;
+// };
 
 const readFile = async () => {
   if (window.showOpenFilePicker) {
-    const fileList = await showOpenFilePicker({
+    const fileList = await window.showOpenFilePicker({
       types: [
         {
           description: "JSON",
@@ -206,7 +209,7 @@ const readFile = async () => {
 
 const writeFile = async () => {
   if (window.showOpenFilePicker) {
-    const fileList = await showOpenFilePicker({
+    const fileList: FileSystemFileHandle[] = await window.showOpenFilePicker({
       types: [
         {
           description: "JSON",
@@ -219,8 +222,6 @@ const writeFile = async () => {
       multiple: false,
     });
     fileList.forEach(async (item) => {
-      const fileData = await item.getFile();
-      const text = await fileData.text();
       const writableStream = await item.createWritable();
       await writableStream.write(JSON.stringify(todoList.value));
       await writableStream.close();
