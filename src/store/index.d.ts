@@ -1,7 +1,8 @@
 interface TodoItem {
   title: string,
   date: number,
-  text: string
+  text: string,
+  done: boolean
 }
 
 interface DateItem {

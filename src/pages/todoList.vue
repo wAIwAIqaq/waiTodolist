@@ -28,18 +28,41 @@
           <div
             v-for="(item, index) in dateItem.list"
             :key="index"
-            class="todo-list-item flex flex-col gap-4 p-4 dark:text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
-            @click="showItemDetail(item)"
+            class="todo-list-item flex p-3 dark:text-sky-100 border-sky-100 border rounded-lg transition-all cursor-pointer"
           >
             <div
-              class="item-title flex justify-between gap-3 text-2xl transition-all"
+              class="flex-1 flex gap-3 p-4 flex-col"
+              @click="showItemDetail(item)"
             >
-              {{ item.title }}
+              <div
+                class="item-title flex justify-between gap-3 text-[16px] transition-all"
+              >
+                {{ item.title }}
+              </div>
+              <div>{{ dayjs(item.date).format("YYYY-MM-DD") }}</div>
+              <n-ellipsis :line-clamp="3">
+                {{ item.text }}
+              </n-ellipsis>
             </div>
-            <div>{{ dayjs(item.date).format("YYYY-MM-DD") }}</div>
-            <n-ellipsis :line-clamp="3">
-              {{ item.text }}
-            </n-ellipsis>
+            <div class="flex flex-col justify-between">
+              <n-popconfirm positive-text="删除它" negative-text="not ok">
+                <template #icon>
+                  <span class="text-[14px]">🤔</span>
+                </template>
+                <template #trigger>
+                  <n-button class="text-[16px]" text type="error">
+                    <ion-icon name="trash-outline" />
+                  </n-button>
+                </template>
+                <template #action>
+                  <div>
+                    <n-button size="tiny" type="error">删除</n-button>                  
+                  </div>
+                </template>
+                你一定要删除它吗？
+              </n-popconfirm>
+              <n-checkbox v-model:check="item.done" />
+            </div>
           </div>
         </div>
       </n-collapse-transition>
@@ -101,7 +124,7 @@ todoListStore.initTodoList();
 const { todoList } = storeToRefs(todoListStore);
 const dialog = useDialog();
 const showItemDetail = (
-  item = { title: "", date: todayTimestamp.value, text: "" }
+  item = { title: "", date: todayTimestamp.value, text: "", done: false }
 ) => {
   const changedItem = ref({ ...item });
   const isChanged = ref(false);
@@ -234,7 +257,6 @@ const writeFile = async () => {
 .todo-list-item {
   $activeColor: #7fe7c4;
   display: flex;
-  flex: column;
   border: 1px solid $activeColor;
   &:hover {
     box-shadow: 0 0 10px $activeColor;

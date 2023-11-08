@@ -12,6 +12,8 @@ import {
   scrollbarDark,
   dividerDark,
   cardDark,
+  checkboxDark,
+  popconfirmDark
 } from "naive-ui";
 
 const themeStore = useThemeStore();
@@ -24,6 +26,8 @@ const darkTheme = createTheme([
   scrollbarDark,
   dividerDark,
   cardDark,
+  checkboxDark,
+  popconfirmDark
 ]);
 </script>
 
